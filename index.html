@@ -10,7 +10,7 @@
 		<h1><font size="18">Page Flows</font></h1>
 		By loading all possible funnels at once, find the most & least popular pages visited after your selected root event.<br>
 		When you find a pairing of interest, dig deeper in the <a href="https://mixpanel.com/report/639919/funnels/">dedicated Funnels report.</a><br><br><br>
-		(recent unique count) [Event Name] <div id="eventSelect"></div>
+		<div id="eventSelect"></div>(recent unique count) [Event Name] 
 		<div id="datePicker"></div>
 		<div id="dataTable"></div>
 
@@ -31,34 +31,13 @@
 
 
 
-			var fromDate = default_fromDate //dateSelector.val().from
-			var toDate = today //dateSelector.val().to
-
-
-			// console.log(fromDate)
-   //      	console.log(toDate)
+			var fromDate = default_fromDate 
+			var toDate = today 
 
 			var allEvents = []
 			var chartData = {}
 
 			//Initial Setup
-			// MP.api.query('api/2.0/events/properties/values/', {event: 'Viewed Page', name: 'Page Name'}).done(function(results) {
-			// 	for (var i in results) {
-			// 		var pageName = (results[i])
-			// 		console.log(pageName)
-			// 		var dropdownItem = {}
-			// 		allEvents.push(pageName)
-			// 		dropdownItem["label"] = pageName
-			// 		dropdownItem["value"] = pageName
-			// 		dropdownOptions["items"].push(dropdownItem)
-			// 	}
-			// 	var sortedDropdown = dropdownOptions["items"].sort()
-			// 	dropdownOptions["items"] = {}
-			// 	dropdownOptions["items"] = sortedDropdown
-			// 	eventSelect.MPSelect(dropdownOptions)
-			// 	})
-
-
 			MP.api.segment('Viewed Page', 'Page Name', {type: 'unique'}).done(function(results) {
 				var alphaKeys = (_.keys(results.values()))
 
@@ -73,19 +52,6 @@
 					dropdownOptions["items"].push(dropdownItem)
 				}
 
-				// for (var i in alphaKeys.sort()) {
-				// 	var pageName = (alphaKeys[i])
-				// 	var dropdownItem = {}
-				// 	allEvents.push(pageName)
-				// 	dropdownItem["label"] = pageName
-				// 	dropdownItem["value"] = pageName
-				// 	dropdownOptions["items"].push(dropdownItem)
-				// }
-			// var sortedDropdown = dropdownOptions["items"].sort()
-			// dropdownOptions["items"] = {}
-			// dropdownOptions["items"] = sortedDropdown
-			// console.log(sortedDropdown)
-			// console.log(dropdownOptions["items"])
 			eventSelect.MPSelect(dropdownOptions)
 			})
 
@@ -100,20 +66,15 @@
 
 				for (var i in allOtherPages) {
 					var currentGoal = allOtherPages[i]
-					// console.log(currentGoal)
 					var event1Where = "(string(properties[\"Page Name\"]) == \""+eventSelection+"\")"
 					var event1 = {event: "Viewed Page", selector: event1Where}
 
 					var event2Where = "(string(properties[\"Page Name\"]) == \""+allOtherPages[i]+"\")"
 					var event2 = {event: "Viewed Page", selector: event2Where}
-
-					// console.log(event1)
-					// console.log(event2)
+					
 					var funnel = MP.api.funnel(event1, event2, {from: fromDate, to: toDate});
 					funnelPromises.push(funnel)
 				}
-
-				// console.log(funnelPromises)
 
 				Promise.all(funnelPromises).then(function(data) {
 					console.log(data)
@@ -122,15 +83,12 @@
 						var count = 0
 					    _.each(funnel[1], function(date){
 					        pageName = (date.selector.split("== ")[1].slice(0,-1));
-					        // count += (date.count)
 					        count += date.count
 					    });	    
 					    chartData[pageName] = {}
 					    chartData[pageName]["Unique Conversions from Root Page"] = count
 
-					    // console.log(chartData)
 					})
-					// console.log(chartData)
 					dataTable.MPTable('setData', chartData)
 				})	
 				}
